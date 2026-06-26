@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kang SIM Info</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@700;800&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      <span class="logo-icon">📡</span>
+      <span class="logo-text">Kang <span class="accent">SIM</span> Info</span>
+    </div>
+    <p class="tagline">Search SIM number details instantly</p>
+  </header>
+
+  <main>
+    <div class="search-card">
+      <label for="simInput">Enter SIM Number</label>
+      <div class="search-row">
+        <input
+          type="text"
+          id="simInput"
+          placeholder="e.g. 03001234567"
+          maxlength="11"
+          inputmode="numeric"
+        />
+        <button id="searchBtn" onclick="searchSIM()">Search</button>
+      </div>
+      <p class="hint">Enter 11-digit Pakistani mobile number</p>
+    </div>
+
+    <div id="result" class="result-area hidden"></div>
+
+    <div id="stats" class="stats-bar hidden">
+      <span id="totalCount"></span>
+    </div>
+  </main>
+
+  <footer>
+    <p>Kang SIM Info &copy; 2026 &mdash; For authorized use only</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
