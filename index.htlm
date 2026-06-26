@@ -250,7 +250,7 @@
   </footer>
 
   <script>
-    var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzaHXbiQ4uIAdG6cyfQUsr61DgElJcf8iGC0freucwH0skZd56C6Q5nFrWWRsAoaxhC/exec';
+    var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz3Cf4ZzbfHePULWkYJU_c9dbPvrfYlM7JIMUjzZRfN-hLaWArkSMDmbERxKIRc_VBF/exec';
 
     document.getElementById('simInput').addEventListener('keydown', function(e) {
       if (e.key === 'Enter') searchSIM();
