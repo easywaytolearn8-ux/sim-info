@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kang SIM Info – Pakistan SIM Data Lookup</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --black:    #080e08;
+      --deep:     #0a120a;
+      --panel:    #0d1a0d;
+      --border:   #1a3a1a;
+      --green:    #00ff41;
+      --green-dim:#00c832;
+      --green-low:#003a10;
+      --green-glow: rgba(0,255,65,0.18);
+      --text:     #b8f0b8;
+      --muted:    #4a7a4a;
+      --white:    #e8ffe8;
+      --red:      #ff3a3a;
+      --yellow:   #ffe040;
+      --font-display: 'Orbitron', monospace;
+      --font-mono:    'Share Tech Mono', monospace;
+      --font-body:    'Inter', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Scanline overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.08) 2px,
+        rgba(0,0,0,0.08) 4px
+      );
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(8,14,8,0.95);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      height: 56px;
+    }
+
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--green);
+      letter-spacing: 2px;
+      text-shadow: 0 0 12px var(--green);
+    }
+
+    .nav-logo span { color: var(--white); }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 1px;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--green); }
+
+    .nav-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--green-dim);
+    }
+
+    .nav-status::before {
+      content: '';
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: blink 1.4s infinite;
+    }
+
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      padding: 72px 24px 56px;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.4;
+    }
+
+    .hero-glow {
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 500px; height: 300px;
+      background: radial-gradient(ellipse, rgba(0,255,65,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--green);
+      letter-spacing: 3px;
+      border: 1px solid var(--green-low);
+      padding: 4px 14px;
+      border-radius: 2px;
+      margin-bottom: 24px;
+      background: rgba(0,255,65,0.04);
+    }
+
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(26px, 6vw, 52px);
+      font-weight: 900;
+      color: var(--white);
+      line-height: 1.1;
+      letter-spacing: 3px;
+      margin-bottom: 8px;
+      text-shadow: 0 0 30px rgba(0,255,65,0.3);
+      position: relative;
+    }
+
+    .hero h1 .accent { color: var(--green); }
+
+    .hero-sub {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 48px;
+      letter-spacing: 1px;
+    }
+
+    /* ── SEARCH BOX ── */
+    .search-wrap {
+      position: relative;
+      max-width: 600px;
+      margin: 0 auto 16px;
+    }
+
+    .search-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--green);
+      text-align: left;
+      display: block;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    .search-label::before { content: '> '; }
+
+    .search-row {
+      display: flex;
+      gap: 0;
+      border: 1px solid var(--green-dim);
+      border-radius: 3px;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(0,255,65,0.08);
+      transition: box-shadow 0.3s;
+    }
+
+    .search-row:focus-within {
+      box-shadow: 0 0 30px rgba(0,255,65,0.2);
+      border-color: var(--green);
+    }
+
+    .search-row input {
+      flex: 1;
+      background: var(--panel);
+      border: none;
+      outline: none;
+      color: var(--green);
+      font-family: var(--font-mono);
+      font-size: 16px;
+      padding: 14px 18px;
+      letter-spacing: 2px;
+    }
+
+    .search-row input::placeholder {
+      color: var(--muted);
+      letter-spacing: 1px;
+      font-size: 13px;
+    }
+
+    .search-row button {
+      background: var(--green);
+      color: var(--black);
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 0 28px;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+
+    .search-row button:hover {
+      background: #00ff80;
+      box-shadow: 0 0 20px rgba(0,255,65,0.5);
+    }
+
+    .search-hint {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--muted);
+      text-align: left;
+      margin-top: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── RESULT PANEL ── */
+    .result-panel {
+      max-width: 600px;
+      margin: 24px auto 0;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      display: none;
+    }
+
+    .result-panel.visible { display: block; }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: var(--green-low);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .result-header span {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--green);
+      letter-spacing: 1px;
+    }
+
+    .result-status {
+      font-size: 10px;
+      color: var(--green-dim);
+    }
+
+    .result-rows { padding: 16px; }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(26,58,26,0.5);
+      font-family: var(--font-mono);
+      font-size: 13px;
+    }
+
+    .result-row:last-child { border-bottom: none; }
+
+    .result-key { color: var(--muted); letter-spacing: 1px; }
+    .result-val { color: var(--green); font-weight: 600; }
+    .result-val.network-jazz { color: #ff6b35; }
+    .result-val.network-zong { color: #00bfff; }
+    .result-val.network-ufone { color: #9b59b6; }
+    .result-val.network-telenor { color: #ffe040; }
+
+    /* ── STATS BAR ── */
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--deep);
+      overflow-x: auto;
+    }
+
+    .stat-item {
+      flex: 1;
+      min-width: 120px;
+      padding: 20px 16px;
+      text-align: center;
+      border-right: 1px solid var(--border);
+    }
+
+    .stat-item:last-child { border-right: none; }
+
+    .stat-num {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--green);
+      text-shadow: 0 0 16px rgba(0,255,65,0.4);
+      display: block;
+    }
+
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 1px;
+      margin-top: 4px;
+      display: block;
+    }
+
+    /* ── NETWORKS ── */
+    .section {
+      padding: 56px 24px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .section-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--green);
+      letter-spacing: 3px;
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(18px, 3vw, 26px);
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: 2px;
+      margin-bottom: 32px;
+    }
+
+    .networks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    .network-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 20px 18px;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .network-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+    }
+
+    .network-card.jazz::before  { background: #ff6b35; }
+    .network-card.zong::before  { background: #00bfff; }
+    .network-card.ufone::before { background: #9b59b6; }
+    .network-card.telenor::before { background: #ffe040; }
+    .network-card.scom::before  { background: var(--green); }
+
+    .network-card:hover {
+      border-color: var(--green-dim);
+      box-shadow: 0 0 20px rgba(0,255,65,0.1);
+      transform: translateY(-2px);
+    }
+
+    .network-name {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+
+    .network-card.jazz .network-name   { color: #ff6b35; }
+    .network-card.zong .network-name   { color: #00bfff; }
+    .network-card.ufone .network-name  { color: #9b59b6; }
+    .network-card.telenor .network-name{ color: #ffe040; }
+    .network-card.scom .network-name   { color: var(--green); }
+
+    .network-prefix {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .how-section {
+      background: var(--deep);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 56px 24px;
+    }
+
+    .how-inner {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+      margin-top: 32px;
+    }
+
+    .step {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--green-low);
+      line-height: 1;
+      min-width: 36px;
+      text-shadow: 0 0 20px rgba(0,255,65,0.2);
+    }
+
+    .step-text h3 {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--white);
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .step-text p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+      background: var(--deep);
+    }
+
+    .footer-logo {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--green);
+      letter-spacing: 3px;
+      margin-bottom: 12px;
+    }
+
+    .footer-text {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .footer-disclaimer {
+      font-size: 11px;
+      color: #2a4a2a;
+      margin-top: 16px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ── TERMINAL TYPING ── */
+    .typed-cursor {
+      display: inline-block;
+      width: 8px; height: 15px;
+      background: var(--green);
+      vertical-align: middle;
+      animation: blink 0.8s infinite;
+      margin-left: 2px;
+    }
+
+    /* ── ALERT BAR ── */
+    .alert-bar {
+      background: var(--green-low);
+      border-bottom: 1px solid var(--green-dim);
+      padding: 8px 24px;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--green);
+      letter-spacing: 1px;
+    }
+
+    .alert-bar span { color: var(--muted); }
+
+    /* ── SEARCH TYPE TOGGLE ── */
+    .search-type-toggle {
+      display: flex;
+      max-width: 600px;
+      margin: 0 auto 16px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .toggle-btn {
+      flex: 1;
+      padding: 11px 0;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--muted);
+      transition: background 0.2s, color 0.2s;
+      position: relative;
+    }
+
+    .toggle-btn::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 20%; bottom: 20%;
+      width: 1px;
+      background: var(--border);
+    }
+
+    .toggle-btn:first-child::before { display: none; }
+
+    .toggle-btn.active {
+      background: var(--green-low);
+      color: var(--green);
+      text-shadow: 0 0 10px rgba(0,255,65,0.4);
+    }
+
+    .toggle-btn .toggle-icon {
+      display: block;
+      font-size: 16px;
+      margin-bottom: 2px;
+      font-family: var(--font-mono);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .stats-bar { flex-wrap: wrap; }
+      .stat-item { min-width: 50%; border-bottom: 1px solid var(--border); }
+      .search-row button { padding: 0 16px; font-size: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Alert Bar -->
+<div class="alert-bar">
+  ◈ LIVE DATABASE &nbsp;<span>|</span>&nbsp; 10,000,000+ RECORDS &nbsp;<span>|</span>&nbsp; ALL PAKISTAN NETWORKS COVERED &nbsp;<span>|</span>&nbsp; ◈
+</div>
+
+<!-- Navbar -->
+<nav>
+  <div class="nav-logo">KANG <span>SIM</span> INFO</div>
+  <ul class="nav-links">
+    <li><a href="#search">LOOKUP</a></li>
+    <li><a href="#networks">NETWORKS</a></li>
+    <li><a href="#how">HOW IT WORKS</a></li>
+    <li><a href="#contact">CONTACT</a></li>
+  </ul>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
+    <div class="nav-status">SYSTEM ONLINE</div>
+    <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1px;">
+      Dev: <span style="color:var(--green);text-shadow:0 0 6px rgba(0,255,65,0.5);">Shehzad Siyal</span>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero" id="search">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+
+  <div class="hero-tag">PAKISTAN SIM INFORMATION SYSTEM</div>
+
+  <h1>
+    <span class="accent">KANG</span> SIM INFO<span class="typed-cursor"></span>
+  </h1>
+  <p class="hero-sub">// Instant SIM owner lookup &amp; network identification for Pakistan</p>
+
+  <!-- Search Type Toggle -->
+  <div class="search-type-toggle">
+    <button class="toggle-btn active" id="btnMobile" onclick="switchMode('mobile')">
+      <span class="toggle-icon">#</span>
+      MOBILE NO.
+    </button>
+    <button class="toggle-btn" id="btnCNIC" onclick="switchMode('cnic')">
+      <span class="toggle-icon">▣</span>
+      CNIC
+    </button>
+  </div>
+
+  <!-- Search Box -->
+  <div class="search-wrap">
+    <span class="search-label" id="searchLabel">Enter mobile number to lookup</span>
+    <div class="search-row">
+      <input type="tel" id="simInput" maxlength="11" placeholder="03XX XXXXXXX" inputmode="numeric"/>
+      <button onclick="lookupSIM()">LOOKUP</button>
+    </div>
+    <div class="search-hint" id="searchHint">// Format: 03001234567 &nbsp;|&nbsp; 11 digits &nbsp;|&nbsp; No dashes or spaces</div>
+  </div>
+
+  <!-- Result Panel -->
+  <div class="result-panel" id="resultPanel">
+    <div class="result-header">
+      <span>// QUERY RESULT</span>
+      <span class="result-status" id="resultStatus">FOUND</span>
+    </div>
+    <div class="result-rows" id="resultRows"></div>
+  </div>
+</section>
+
+<!-- Stats Bar -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <span class="stat-num">10M+</span>
+    <span class="stat-label">TOTAL RECORDS</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">5</span>
+    <span class="stat-label">NETWORKS</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">&lt;1s</span>
+    <span class="stat-label">LOOKUP SPEED</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">24/7</span>
+    <span class="stat-label">UPTIME</span>
+  </div>
+</div>
+
+<!-- Networks -->
+<section class="section" id="networks">
+  <div class="section-eyebrow">// SUPPORTED NETWORKS</div>
+  <div class="section-title">ALL PAKISTAN OPERATORS</div>
+  <div class="networks-grid">
+    <div class="network-card jazz">
+      <div class="network-name">JAZZ</div>
+      <div class="network-prefix">0300, 0301, 0302, 0303, 0304, 0305, 0306, 0307, 0308, 0309</div>
+    </div>
+    <div class="network-card zong">
+      <div class="network-name">ZONG</div>
+      <div class="network-prefix">0310, 0311, 0312, 0313, 0314, 0315, 0316, 0317, 0318, 0319</div>
+    </div>
+    <div class="network-card ufone">
+      <div class="network-name">UFONE</div>
+      <div class="network-prefix">0331, 0332, 0333, 0334, 0335, 0336, 0337, 0338, 0339</div>
+    </div>
+    <div class="network-card telenor">
+      <div class="network-name">TELENOR</div>
+      <div class="network-prefix">0340, 0341, 0342, 0343, 0344, 0345, 0346, 0347, 0348, 0349</div>
+    </div>
+    <div class="network-card scom">
+      <div class="network-name">SCOM</div>
+      <div class="network-prefix">0320, 0321, 0322, 0323</div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works -->
+<div class="how-section" id="how">
+  <div class="how-inner">
+    <div class="section-eyebrow">// PROCESS</div>
+    <div class="section-title">HOW IT WORKS</div>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-text">
+          <h3>ENTER NUMBER</h3>
+          <p>Type the 11-digit Pakistani mobile number you want to look up.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-text">
+          <h3>QUERY DATABASE</h3>
+          <p>Our system searches 10 million+ records instantly across all networks.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-text">
+          <h3>GET RESULTS</h3>
+          <p>Owner name, CNIC, network, and city displayed in seconds.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer id="contact">
+  <div class="footer-logo">KANG SIM INFO</div>
+  <div class="footer-text">// Pakistan SIM Information Lookup System</div>
+  <div class="footer-disclaimer">
+    This service is intended for legitimate identification purposes only. All data is sourced from publicly available records. Misuse of this service is strictly prohibited.
+  </div>
+</footer>
+
+<script>
+  let searchMode = 'mobile';
+
+  function switchMode(mode) {
+    searchMode = mode;
+    const input = document.getElementById('simInput');
+    const label = document.getElementById('searchLabel');
+    const hint  = document.getElementById('searchHint');
+    const btnM  = document.getElementById('btnMobile');
+    const btnC  = document.getElementById('btnCNIC');
+
+    // Reset result
+    document.getElementById('resultPanel').classList.remove('visible');
+
+    if (mode === 'mobile') {
+      btnM.classList.add('active');
+      btnC.classList.remove('active');
+      input.placeholder   = '03XX XXXXXXX';
+      input.maxLength     = 11;
+      input.inputMode     = 'numeric';
+      input.type          = 'tel';
+      label.textContent   = '> Enter mobile number to lookup';
+      hint.innerHTML      = '// Format: 03001234567 &nbsp;|&nbsp; 11 digits &nbsp;|&nbsp; No dashes or spaces';
+    } else {
+      btnC.classList.add('active');
+      btnM.classList.remove('active');
+      input.placeholder   = 'XXXXX-XXXXXXX-X';
+      input.maxLength     = 15;
+      input.inputMode     = 'numeric';
+      input.type          = 'text';
+      label.textContent   = '> Enter CNIC number to lookup';
+      hint.innerHTML      = '// Format: 3410112345671 &nbsp;|&nbsp; 13 digits &nbsp;|&nbsp; No dashes or spaces';
+    }
+
+    input.value = '';
+    input.focus();
+  }
+
+  // Network detection from prefix
+  function detectNetwork(num) {
+    const prefix = num.substring(0, 4);
+    const jazz    = ['0300','0301','0302','0303','0304','0305','0306','0307','0308','0309'];
+    const zong    = ['0310','0311','0312','0313','0314','0315','0316','0317','0318','0319'];
+    const scom    = ['0320','0321','0322','0323'];
+    const ufone   = ['0331','0332','0333','0334','0335','0336','0337','0338','0339'];
+    const telenor = ['0340','0341','0342','0343','0344','0345','0346','0347','0348','0349'];
+    if (jazz.includes(prefix))    return { name: 'Jazz / Warid', cls: 'network-jazz' };
+    if (zong.includes(prefix))    return { name: 'Zong', cls: 'network-zong' };
+    if (ufone.includes(prefix))   return { name: 'Ufone', cls: 'network-ufone' };
+    if (telenor.includes(prefix)) return { name: 'Telenor', cls: 'network-telenor' };
+    if (scom.includes(prefix))    return { name: 'SCO / SCOM', cls: '' };
+    return null;
+  }
+
+  function lookupSIM() {
+    const input  = document.getElementById('simInput').value.replace(/\s|-/g, '');
+    const panel  = document.getElementById('resultPanel');
+    const rows   = document.getElementById('resultRows');
+    const status = document.getElementById('resultStatus');
+
+    panel.classList.remove('visible');
+
+    if (searchMode === 'mobile') {
+      if (input.length !== 11 || !input.startsWith('0')) {
+        rows.innerHTML = `<div class="result-row"><span class="result-key">ERROR</span><span class="result-val" style="color:var(--red)">Invalid number — must be 11 digits starting with 0</span></div>`;
+        panel.classList.add('visible');
+        status.textContent = 'ERROR'; status.style.color = 'var(--red)';
+        return;
+      }
+      const network = detectNetwork(input);
+      if (!network) {
+        rows.innerHTML = `<div class="result-row"><span class="result-key">NETWORK</span><span class="result-val" style="color:var(--red)">Unknown prefix</span></div>`;
+        panel.classList.add('visible');
+        status.textContent = 'NOT FOUND'; status.style.color = 'var(--red)';
+        return;
+      }
+      status.textContent = 'FOUND'; status.style.color = 'var(--green)';
+      rows.innerHTML = `
+        <div class="result-row"><span class="result-key">MOBILE NO.</span><span class="result-val">${input}</span></div>
+        <div class="result-row"><span class="result-key">NETWORK</span><span class="result-val ${network.cls}">${network.name}</span></div>
+        <div class="result-row"><span class="result-key">OWNER NAME</span><span class="result-val">— Connect API —</span></div>
+        <div class="result-row"><span class="result-key">CNIC</span><span class="result-val">— Connect API —</span></div>
+        <div class="result-row"><span class="result-key">CITY</span><span class="result-val">— Connect API —</span></div>
+      `;
+
+    } else {
+      // CNIC mode
+      if (input.length !== 13 || isNaN(input)) {
+        rows.innerHTML = `<div class="result-row"><span class="result-key">ERROR</span><span class="result-val" style="color:var(--red)">Invalid CNIC — must be 13 digits</span></div>`;
+        panel.classList.add('visible');
+        status.textContent = 'ERROR'; status.style.color = 'var(--red)';
+        return;
+      }
+      status.textContent = 'FOUND'; status.style.color = 'var(--green)';
+      rows.innerHTML = `
+        <div class="result-row"><span class="result-key">CNIC</span><span class="result-val">${input}</span></div>
+        <div class="result-row"><span class="result-key">OWNER NAME</span><span class="result-val">— Connect API —</span></div>
+        <div class="result-row"><span class="result-key">MOBILE NO.</span><span class="result-val">— Connect API —</span></div>
+        <div class="result-row"><span class="result-key">NETWORK</span><span class="result-val">— Connect API —</span></div>
+        <div class="result-row"><span class="result-key">CITY</span><span class="result-val">— Connect API —</span></div>
+      `;
+    }
+
+    panel.classList.add('visible');
+  }
+
+  // Enter key support
+  document.getElementById('simInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') lookupSIM();
+  });
+</script>
+</body>
+</html>
