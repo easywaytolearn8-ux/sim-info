@@ -1,37 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIM Info Checker</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        .search-container { margin-bottom: 20px; }
-        input[type="text"] { padding: 10px; width: 250px; font-size: 16px; }
-        button { padding: 10px 20px; font-size: 16px; cursor: pointer; background-color: #007bff; color: white; border: none; }
-        button:hover { background-color: #0056b3; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background-color: #f4f4f4; }
-        .dev-info { margin-top: 20px; font-size: 0.9em; color: #555; }
-    </style>
-</head>
-<body>
-
-    <h2>SIM Information Search</h2>
-    
-    <!-- Search Box for User Input -->
-    <div class="search-container">
-        <input type="text" id="searchInput" placeholder="e.g., 03417090793">
-        <button onclick="loadSimData()">Search</button>
-    </div>
-
-    <!-- The table and results will be generated inside this div -->
-    <div id="results-container"></div>
-
     <script>
         function loadSimData() {
-            // Get the value typed into the search box
             const searchValue = document.getElementById('searchInput').value.trim();
             const container = document.getElementById('results-container');
             
@@ -44,13 +12,19 @@
             // Show a loading message while fetching
             container.innerHTML = '<p>Loading data...</p>';
 
-            // Build the live API link dynamically using HTTPS
-            const apiLink = `https://wasifali.biz.id/public_apis/sim-info-api.php?search=${searchValue}`;
+            // 1. Define your original API URL (using standard http)
+            const targetUrl = `http://wasifali.biz.id/public_apis/sim-info-api.php?search=${searchValue}`;
+            
+            // 2. Wrap it in a free secure Proxy to bypass GitHub's HTTPS block
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
 
-            fetch(apiLink)
-                .then(response => response.json())
+            // Fetch using the proxy
+            fetch(proxyUrl)
+                .then(response => {
+                    if (!response.ok) throw new Error('Proxy blocked or API down');
+                    return response.json();
+                })
                 .then(data => {
-                    // Check if the API returned a success status and has records
                     if (data.success && data.records && data.records.length > 0) {
                         
                         let html = `
@@ -67,7 +41,6 @@
                                 </thead>
                                 <tbody>`;
                         
-                        // Loop through each record in the JSON and add a table row
                         data.records.forEach(record => {
                             html += `
                                 <tr>
@@ -83,7 +56,6 @@
                                 </tbody>
                             </table>`;
                         
-                        // Add the developer info at the bottom
                         if (data.developer) {
                             html += `
                                 <div class="dev-info">
@@ -103,6 +75,4 @@
                 });
         }
     </script>
-</body>
-</html>
 
