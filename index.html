@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kang SIM Info</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0f1e;
+      --border: #1e2d45;
+      --accent: #00d4ff;
+      --accent2: #0099cc;
+      --text: #e8edf5;
+      --muted: #6b7a99;
+      --card-bg: #141d2e;
+      --radius: 14px;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      width: 100%;
+      max-width: 680px;
+      padding: 48px 24px 24px;
+      text-align: center;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .logo-icon { font-size: 28px; }
+    .logo-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .logo-text .accent { color: var(--accent); }
+    .tagline { color: var(--muted); font-size: 14px; }
+    main {
+      width: 100%;
+      max-width: 680px;
+      padding: 0 24px 48px;
+      flex: 1;
+    }
+    .search-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+    .search-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 20px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 11px 16px;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .tab-btn:first-child { border-right: 1.5px solid var(--border); }
+    .tab-btn.active { background: var(--accent); color: #000; }
+    .tab-btn:not(.active):hover { background: rgba(0,212,255,0.08); color: var(--accent); }
+    .search-card label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 10px;
+    }
+    .search-row { display: flex; gap: 10px; }
+    input[type="text"] {
+      flex: 1;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 16px;
+      padding: 13px 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus { border-color: var(--accent); }
+    input[type="text"]::placeholder { color: var(--muted); }
+    button#searchBtn {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 13px 24px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    button#searchBtn:hover { background: var(--accent2); color: #fff; }
+    .hint { color: var(--muted); font-size: 12px; margin-top: 8px; text-align: center; width: 100%; }
+    .result-area {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 16px;
+      animation: fadeIn 0.25s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .result-area.not-found {
+      border-color: #ff4444;
+      text-align: center;
+      color: #ff6666;
+      padding: 36px;
+    }
+    .nf-icon { font-size: 36px; margin-bottom: 10px; }
+    .result-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .result-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    /* Multiple results */
+    .multi-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .multi-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .record-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .record-card:last-child { margin-bottom: 0; }
+    .record-num {
+      font-size: 11px;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .info-item {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .info-item.full-width { grid-column: 1 / -1; }
+    .info-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      margin-bottom: 4px;
+    }
+    .info-value {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      word-break: break-word;
+    }
+    .info-value.sim-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
+      color: var(--accent);
+    }
+    .network-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .net-jazz    { background: #ff5722; color: #fff; }
+    .net-telenor { background: #1565c0; color: #fff; }
+    .net-zong    { background: #7b1fa2; color: #fff; }
+    .net-ufone   { background: #c62828; color: #fff; }
+    .net-other   { background: #37474f; color: #fff; }
+    .loading { text-align: center; padding: 36px; color: var(--muted); }
+    .loading-spinner {
+      font-size: 32px;
+      animation: spin 1s linear infinite;
+      display: block;
+      margin-bottom: 12px;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    .stats-bar {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 4px;
+    }
+    footer {
+      width: 100%;
+      text-align: center;
+      padding: 16px;
+      color: var(--muted);
+      font-size: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .hidden { display: none !important; }
+    @media (max-width: 480px) {
+      header { padding: 32px 16px 16px; }
+      main { padding: 0 16px 32px; }
+      .search-row { flex-direction: column; }
+      button#searchBtn { width: 100%; padding: 14px; }
+      .info-grid { grid-template-columns: 1fr; }
+      .info-item.full-width { grid-column: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      <span class="logo-icon">📡</span>
+      <span class="logo-text">Kang <span class="accent">SIM</span> Info</span>
+    </div>
+    <p class="tagline">Search SIM number details instantly</p>
+  </header>
+
+  <main>
+    <div class="search-card">
+      <div class="search-tabs">
+        <button class="tab-btn active" id="tabMobile" onclick="switchTab('mobile')">📱 Mobile No.</button>
+        <button class="tab-btn" id="tabCnic" onclick="switchTab('cnic')">🪪 CNIC</button>
+      </div>
+      <label id="searchLabel" for="simInput">Enter Mobile Number</label>
+      <div class="search-row">
+        <input type="text" id="simInput" placeholder="e.g. 03001234567" maxlength="11" inputmode="numeric"/>
+        <button id="searchBtn" onclick="searchSIM()">Search</button>
+      </div>
+      <p class="hint" id="searchHint">Enter 11 digit Pakistani mobile number without spaces</p>
+    </div>
+
+    <div id="result" class="hidden"></div>
+    <div class="stats-bar">📡 Kang SIM Info — 10 Million Records</div>
+  </main>
+
+  <footer>
+    <p>Kang SIM Info &copy; 2026 — For authorized use only</p>
+    <p style="margin-top:4px;">Developed By : Shehzad Siyal</p>
+  </footer>
+
+  <script>
+    var API_URL = 'https://api.allorigins.win/get?url=' + encodeURIComponent('https://wasifali.biz.id/public_apis/sim-info-api.php?search=');
+    var searchMode = 'mobile';
+
+    function switchTab(mode) {
+      searchMode = mode;
+      var input  = document.getElementById('simInput');
+      var label  = document.getElementById('searchLabel');
+      var hint   = document.getElementById('searchHint');
+      var tabM   = document.getElementById('tabMobile');
+      var tabC   = document.getElementById('tabCnic');
+      document.getElementById('result').className = 'hidden';
+      if (mode === 'mobile') {
+        tabM.classList.add('active'); tabC.classList.remove('active');
+        label.textContent = 'Enter Mobile Number';
+        input.placeholder = 'e.g. 03001234567';
+        input.maxLength = 11;
+        hint.textContent = 'Enter 11 digit Pakistani mobile number without spaces';
+      } else {
+        tabC.classList.add('active'); tabM.classList.remove('active');
+        label.textContent = 'Enter CNIC Number';
+        input.placeholder = 'e.g. 3520112345671';
+        input.maxLength = 15;
+        hint.textContent = 'Enter 13 digit CNIC without dashes';
+      }
+      input.value = '';
+      input.focus();
+    }
+
+    document.getElementById('simInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') searchSIM();
+    });
+
+    function searchSIM() {
+      var input = document.getElementById('simInput').value.trim();
+      if (!input) { showError('Please enter a ' + (searchMode === 'mobile' ? 'mobile number' : 'CNIC') + '.'); return; }
+      if (searchMode === 'mobile' && !/^\d{11}$/.test(input)) { showError('Enter a valid 11 digit mobile number.'); return; }
+      if (searchMode === 'cnic') {
+        var clean = input.replace(/-/g,'');
+        if (!/^\d{13}$/.test(clean)) { showError('Enter a valid 13 digit CNIC.'); return; }
+        input = clean;
+      }
+      showLoading();
+      fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://wasifali.biz.id/public_apis/sim-info-api.php?search=' + encodeURIComponent(input)))
+        .then(function(r) { return r.json(); })
+        .then(function(proxy) {
+          var d = JSON.parse(proxy.contents.replace(/\/\s*$/, ''));
+          if (d.success && d.records && d.records.length > 0) {
+            showResult(d.records);
+          } else {
+            showNotFound(input);
+          }
+        })
+        .catch(function() { showError('Connection error. Please try again.'); });
+    }
+
+    function showLoading() {
+      var el = document.getElementById('result');
+      el.className = 'result-area';
+      el.classList.remove('hidden');
+      el.innerHTML = '<div class="loading"><span class="loading-spinner">⏳</span>Searching records...</div>';
+    }
+
+    function showResult(records) {
+      var el = document.getElementById('result');
+      el.className = 'result-area';
+      el.classList.remove('hidden');
+      var count = records.length;
+      var html = '<div class="multi-title">📋 ' + count + ' Record' + (count > 1 ? 's' : '') + ' Found</div>';
+      for (var i = 0; i < records.length; i++) {
+        var r = records[i];
+        html += '<div class="record-card">';
+        if (count > 1) html += '<div class="record-num">RECORD ' + (i+1) + ' OF ' + count + '</div>';
+        html += '<div class="info-grid">';
+        html += '<div class="info-item full-width"><div class="info-label">Mobile Number</div><div class="info-value sim-num">' + x(r.mobile||'-') + '</div></div>';
+        html += '<div class="info-item"><div class="info-label">Owner Name</div><div class="info-value">' + x(r.name||'-') + '</div></div>';
+        html += '<div class="info-item"><div class="info-label">Network</div><div class="info-value">' + badge(r.network||'') + '</div></div>';
+        html += '<div class="info-item full-width"><div class="info-label">CNIC</div><div class="info-value">' + x(r.cnic||'-') + '</div></div>';
+        html += '<div class="info-item full-width"><div class="info-label">Address</div><div class="info-value">' + x(r.address||'-') + '</div></div>';
+        html += '</div></div>';
+      }
+      el.innerHTML = html;
+    }
+
+    function showNotFound(query) {
+      var el = document.getElementById('result');
+      el.className = 'result-area not-found';
+      el.classList.remove('hidden');
+      el.innerHTML = '<div class="nf-icon">🔍</div><strong>No record found</strong><p style="margin-top:8px;font-size:13px;color:#888;">' + x(query) + ' is not in the database.</p>';
+    }
+
+    function showError(msg) {
+      var el = document.getElementById('result');
+      el.className = 'result-area not-found';
+      el.classList.remove('hidden');
+      el.innerHTML = '<div class="nf-icon">⚠️</div><strong>' + x(msg) + '</strong>';
+    }
+
+    function badge(network) {
+      var n = (network||'').toLowerCase();
+      var c = 'net-other';
+      if (n.indexOf('jazz') !== -1) c = 'net-jazz';
+      else if (n.indexOf('telenor') !== -1) c = 'net-telenor';
+      else if (n.indexOf('zong') !== -1) c = 'net-zong';
+      else if (n.indexOf('ufone') !== -1) c = 'net-ufone';
+      return '<span class="network-badge ' + c + '">' + x(network||'Unknown') + '</span>';
+    }
+
+    function x(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+  </script>
+</body>
+</html>
